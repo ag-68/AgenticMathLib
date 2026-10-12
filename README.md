@@ -47,7 +47,9 @@ uv run ruff check .
 
 ## Results
 
-not run
+Evaluation results: not run.
+
+The shared harness has milestone H1: a fake model client, the agent loop, run logs, and a numeric checker, covered by unit tests. Executors, the real model client, the CLI, and result tables are not implemented.
 
 ## Limitations
 

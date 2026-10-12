@@ -4,15 +4,19 @@ Shared test rig that runs tasks through an agent under different conditions, che
 
 ## Status
 
-**In progress** (2026-10-12). Repository skeleton only. Milestones H1, H2, and H3 have not started.
+**In progress** (2026-10-12). Milestone H1 is implemented and covered by unit tests. H2 and H3 have not started.
 
 ## What works
 
-The package `eval_harness` imports. The project specification is in `SPEC.md`.
+- `Task`, `Condition`, `RunLog`, and `Verdict`.
+- `FakeClient` replays scripted responses and makes no network call.
+- The agent loop sends the system prompt, optional extra context, and task prompt, executes tool calls, and stops on `FINAL_ANSWER:` or after `max_tool_calls` (default 8).
+- `NumericChecker` compares scalars and nested lists within a tolerance.
+- Every run log records the messages, tool calls, parsed answer, verdict, token counts, and wall time.
 
 ## What does not work yet
 
-Dataclasses, the fake client, the agent loop, executors, the real model client, the CLI, and result tables are not implemented.
+`McpExecutor`, `CodeExecutor`, and `ProviderClient` are not implemented. The CLI, analysis tables, and dry-run command are not implemented.
 
 ## Results (real runs only)
 
