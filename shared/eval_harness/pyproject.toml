@@ -1,0 +1,10 @@
+[project]
+name = "eval-harness"
+version = "0.1.0"
+description = "Shared evaluation harness for agentic math tools."
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

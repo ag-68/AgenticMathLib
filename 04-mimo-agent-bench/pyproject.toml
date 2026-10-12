@@ -1,0 +1,15 @@
+[project]
+name = "mimo-agent-bench"
+version = "0.1.0"
+description = "Small benchmark of AI agents on MIMO channel estimation and linear detection."
+requires-python = ">=3.11"
+dependencies = [
+    "eval-harness",
+]
+
+[tool.uv.sources]
+eval-harness = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

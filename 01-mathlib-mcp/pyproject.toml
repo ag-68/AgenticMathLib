@@ -1,0 +1,15 @@
+[project]
+name = "mathlib-mcp"
+version = "0.1.0"
+description = "MCP server that exposes numerical-library tools to AI agents."
+requires-python = ">=3.11"
+dependencies = [
+    "eval-harness",
+]
+
+[tool.uv.sources]
+eval-harness = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

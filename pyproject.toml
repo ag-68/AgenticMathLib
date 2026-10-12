@@ -1,0 +1,62 @@
+[project]
+name = "agentic-math-tools"
+version = "0.1.0"
+description = "Numerical-library APIs made usable by AI agents."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "eval-harness",
+    "mathlib-mcp",
+    "api2llm",
+    "docs-rag-mcp",
+    "mimo-agent-bench",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+    "shared/eval_harness",
+    "01-mathlib-mcp",
+    "02-api2llm",
+    "03-docs-rag-mcp",
+    "04-mimo-agent-bench",
+]
+
+[tool.uv.sources]
+eval-harness = { workspace = true }
+mathlib-mcp = { workspace = true }
+api2llm = { workspace = true }
+docs-rag-mcp = { workspace = true }
+mimo-agent-bench = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = [
+    "shared/eval_harness/src",
+    "01-mathlib-mcp/src",
+    "02-api2llm/src",
+    "03-docs-rag-mcp/src",
+    "04-mimo-agent-bench/src",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+testpaths = [
+    "shared/eval_harness/tests",
+    "01-mathlib-mcp/tests",
+    "02-api2llm/tests",
+    "03-docs-rag-mcp/tests",
+    "04-mimo-agent-bench/tests",
+]

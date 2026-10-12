@@ -1,0 +1,15 @@
+[project]
+name = "docs-rag-mcp"
+version = "0.1.0"
+description = "MCP server that retrieves version-pinned library documentation for agents."
+requires-python = ">=3.11"
+dependencies = [
+    "eval-harness",
+]
+
+[tool.uv.sources]
+eval-harness = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
