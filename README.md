@@ -6,7 +6,7 @@ The repository describes only what is in it. Roadmap items are Planned until the
 
 ## Status
 
-Updated 2026-10-13.
+Updated 2026-10-14.
 
 | Project | What it does | Status | Evidence |
 |---|---|---|---|
@@ -45,7 +45,7 @@ uv run ruff check .
 
 Evaluation results: not run.
 
-The harness has milestone H1: a fake model client, the agent loop, run logs, and numeric, discrete, and interval checkers that return a reward. Project 01 is a package skeleton. Its five tools are not implemented. Project 02 has not been started.
+The harness has milestones H1 and H2: a fake model client, the agent loop, run logs, three checkers, a code sandbox, an MCP executor, and a provider client. No evaluation has been run. Project 01 is a package skeleton. Its five tools are not implemented. Project 02 has not been started.
 
 ## Limitations
 
