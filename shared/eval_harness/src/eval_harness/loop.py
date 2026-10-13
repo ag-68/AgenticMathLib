@@ -5,15 +5,15 @@ import time
 from typing import Any
 
 from eval_harness.answers import parse_final_answer
+from eval_harness.checkers import get_checker
 from eval_harness.models import (
-    Checker,
     Condition,
     ModelClient,
     RunLog,
     Task,
     ToolCall,
     ToolRecord,
-    Verdict,
+    make_verdict,
 )
 
 
@@ -21,11 +21,11 @@ def run_trial(
     task: Task,
     condition: Condition,
     client: ModelClient,
-    checker: Checker,
     *,
     trial: int,
     max_tool_calls: int = 8,
 ) -> RunLog:
+    checker = get_checker(task.check)
     started = time.perf_counter()
     messages: list[dict[str, Any]] = [{"role": "system", "content": condition.system_prompt}]
     if condition.extra_context:
@@ -79,7 +79,7 @@ def run_trial(
         verdict = checker.check(task, parsed.value)
         final_answer = parsed.value
     else:
-        verdict = Verdict(False, "format", parsed.detail)
+        verdict = make_verdict(False, "format", parsed.detail)
         final_answer = None
 
     return RunLog(
@@ -91,6 +91,9 @@ def run_trial(
         tool_calls=records,
         final_answer=final_answer,
         verdict=verdict,
+        reward=verdict.reward,
+        error_kind=verdict.error_kind,
+        split=task.split,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
         wall_time_s=time.perf_counter() - started,

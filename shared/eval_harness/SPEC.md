@@ -1,79 +1,69 @@
 # Shared evaluation harness
 
-This file is the project section of the monorepo specification. The full document, including repository rules and build order, is [docs/SPEC.md](../../docs/SPEC.md).
+This file is the project section of the monorepo specification. The full document is [docs/SPEC.md](../../docs/SPEC.md).
 
-## Part 2: Shared evaluation harness (`shared/eval_harness`)
+## Part 2: Shared evaluation harness (`shared/eval_harness`), about 1-1.25 days
 
 ### 2.1 Purpose
 
-A small, provider-independent test rig that runs tasks through an AI agent under different conditions, checks the answers, and produces comparable metrics. All four projects use it.
+A small, provider-independent rig that runs tasks through an agent under different conditions, checks answers and produces comparable metrics for both projects.
 
 ### 2.2 Design goals
 
-- **Fair comparisons.** Conditions differ only in what is being tested (docs, tools, retrieval), never in the loop around them.
-- **Cheap to test.** A fake model makes the full pipeline testable offline at zero cost.
-- **Auditable.** Every run is logged in full, so any number can be traced to the exact conversation behind it.
-- **Pluggable.** Each project supplies its own tasks, tools and checkers through small interfaces.
-- **Cost-aware.** Estimates budget before a real run and asks for confirmation.
+- Fair: conditions differ only in what is being tested.
+- Cheap to test: a fake model makes the whole pipeline testable offline.
+- Auditable: every run is fully logged.
+- Minimal: no features beyond what the two projects need.
 
-### 2.3 Core concepts and interfaces
+### 2.3 Components
 
-Implement as dataclasses and `typing.Protocol` classes.
-
-- **`Task`:** `id`, `category`, `prompt`, `inputs` (generated from a seed), `reference` (expected answer), `tolerance`, `answer_format`.
-- **`Condition`:** `name`, `system_prompt`, `executor` (what happens when the model acts), `extra_context` (optional text such as docs or a cheat sheet).
-- **`Executor` (protocol):** two implementations.
-  - `McpExecutor`: starts an MCP server over stdio, lists its tools, forwards tool calls.
-  - `CodeExecutor`: runs model-written Python in the sandbox and returns output.
-- **`ModelClient` (protocol):** `complete(messages, tools) -> response`. Implementations: `ProviderClient` (real API; provider and model from config) and `FakeClient` (scripted responses for tests and dry runs).
-- **`Checker` (protocol):** `check(task, final_answer) -> Verdict` with fields `passed`, `error_kind`, `detail`.
-- **`RunLog`:** prompt, condition, trial, every message, every tool call and result, final answer, verdict, token counts, wall time.
-- **`Metrics`:** pass@1, tool-selection accuracy, argument validity rate, error recovery rate, tool calls per task, tokens per task. Metrics that do not apply to a condition (for example tool selection with no tools) are reported as "n/a", not zero.
+- **`Task`:** `id`, `category`, `prompt`, `inputs`, `reference`, `check` (which checker to use), `tolerance`, `split` (`eval` by default; `train` is reserved for the optional Phase 2).
+- **`Condition`:** `name`, `system_prompt`, `executor`, `extra_context`.
+- **Executors:** `McpExecutor` (starts an MCP server over stdio, lists its tools, forwards calls) and `CodeExecutor` (runs model-written Python in the sandbox).
+- **`ModelClient`:** interface with a `ProviderClient` (real API; provider and model from config) and a `FakeClient` (scripted, for tests and dry runs).
+- **Checkers:** numeric (relative tolerance), discrete (exact match), interval (value inside a given range, for noisy simulation results). Every checker returns a verdict with `passed` and a numeric `reward` between 0 and 1 (1 for pass, 0 for fail; partial credit only where a project explicitly defines it).
+- **`RunLog`:** all messages, tool calls and results, final answer, verdict, reward, error kind, task split, tokens, wall time. Stored so it can later be exported as training data (see 2.7).
 
 ### 2.4 Agent loop
 
-1. Send system prompt, extra context and task prompt.
-2. If the model returns tool calls, execute them through the executor and append results. Repeat.
-3. Stop when the model gives a final answer or after `max_tool_calls` (default 8).
-4. The task prompt asks the model to end with `FINAL_ANSWER: <json>`. The checker parses only that.
-5. Log everything, then run the checker.
+Send prompt; execute tool calls or code; repeat; stop at a final answer or after `max_tool_calls` (default 8). The prompt asks the model to end with `FINAL_ANSWER: <json>`; only that is checked.
 
-### 2.5 Sandbox (for `CodeExecutor`)
+### 2.5 Sandbox
 
-- Separate subprocess with timeout (default 20 s), memory limit, temporary working directory, no network.
-- Limitation to state in the README: this protects against runaway code, not against hostile code. Only model output from trusted runs is executed.
+Subprocess with timeout, memory limit, temporary working directory, no network. Limitation to state in READMEs: protects against runaway code, not hostile code.
 
-### 2.6 Configuration (`eval_config.yaml`)
+### 2.6 Metrics
 
-`provider`, `model` (or name of the environment variable holding it), `trials` (default 3), `max_tool_calls` (default 8), `seed`, `timeout_s`, `cache` (default off).
+- pass@1 and **consistency** (all trials pass).
+- Mean reward, tool-call count, argument validity rate (share of tool calls without a validation error), tokens, wall time.
+- **Error kind** counts per condition (each project defines its own labels; see Parts 3 and 4).
+- Not-applicable metrics are shown as "n/a", never as zero.
 
-### 2.7 CLI
+### 2.7 Configuration and CLI
 
-- `eval run --project <name> --conditions A,B,C --trials 3` (prints token estimate first and asks for confirmation).
-- `eval run ... --dry-run` (uses `FakeClient`; no cost).
-- `eval analyze --project <name>` (builds the tables from logs).
+`eval_config.yaml`: `provider`, `model` (or the environment variable that holds it), `trials` (default 3), `max_tool_calls`, `seed`, `timeout_s`. A `model_tier` option lets the same run be repeated with a smaller model.
 
-### 2.8 Analysis output
+- `eval run --project <name> --conditions A,B,C` prints a token estimate and asks for confirmation.
+- `eval run ... --dry-run` uses the fake client.
+- `eval analyze --project <name>` builds `results.md` from the logs.
+- `eval export --project <name> --only-passed --out runs.jsonl` writes the logs of passing runs as JSON Lines in chat format (messages, tool calls, tool results) with task id, split and reward. **Leakage guard:** it exports only runs from `train`-split tasks. Runs from `eval`-split tasks are refused unless `--allow-eval-split` is given, and then a clear contamination warning is printed. In this version there are no `train` tasks, so the export produces an empty file; it exists so Phase 2 does not require harness changes.
 
-For each project: overall table (metrics by condition, mean and spread over trials), per-category success table, and a list of failed runs with their error kind. Written to `eval/results/results.md`.
-
-### 2.9 Initial design choices
+### 2.8 Initial design choices
 
 | Choice | Decision | Reason |
 |---|---|---|
-| Provider coupling | Behind a `ModelClient` protocol | Can compare models later; testable with a fake |
-| Log format | JSON Lines, one run per line | Easy to append, diff and re-analyze |
-| Answer extraction | Single `FINAL_ANSWER:` line with JSON | Simple, unambiguous checking |
-| Statistics | Mean and min-max over trials; no significance claims | Samples are small; do not overclaim |
-| Response cache | Optional, off by default | Saves cost during development; off so reported runs are real |
-| Parallelism | None in v1 | Simplicity; runs are small |
+| Provider coupling | Behind a `ModelClient` interface | Testable; models can be swapped |
+| Log format | JSON Lines, one run per line | Easy to append and re-analyze |
+| Answer extraction | One `FINAL_ANSWER:` line with JSON | Unambiguous checking |
+| Statistics | Mean and min-max over trials; no significance claims | Samples are small |
+| Cache, parallelism | None | Simplicity |
 
-### 2.10 Milestones
+### 2.9 Milestones and acceptance
 
-- H1: dataclasses, protocols, `FakeClient`, loop, `RunLog`, checkers for numeric answers. Tests pass with the fake client.
-- H2: `McpExecutor`, `CodeExecutor` with sandbox, `ProviderClient`.
-- H3: analysis script, CLI, dry-run in CI.
+- H1: task and condition types, fake client, loop, logging, checkers; tests pass.
+- H2: both executors with sandbox, provider client.
+- H3: analysis script, CLI (including `export` with the leakage guard), dry run in CI.
 
-Acceptance: a dry run over a toy task set completes for two conditions and produces a results table.
+Acceptance: a dry run on a toy task set completes for two conditions and writes a results table; the checkers return rewards; a test with the fake client shows that `export` refuses `eval`-split runs and exports `train`-split runs correctly.
 
 ---

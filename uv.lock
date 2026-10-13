@@ -4,24 +4,18 @@ requires-python = ">=3.11"
 
 [manifest]
 members = [
-    "agentic-math-tools",
-    "api2llm",
-    "docs-rag-mcp",
+    "agent-ready-libs",
     "eval-harness",
     "mathlib-mcp",
-    "mimo-agent-bench",
 ]
 
 [[package]]
-name = "agentic-math-tools"
+name = "agent-ready-libs"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "api2llm" },
-    { name = "docs-rag-mcp" },
     { name = "eval-harness" },
     { name = "mathlib-mcp" },
-    { name = "mimo-agent-bench" },
 ]
 
 [package.dev-dependencies]
@@ -32,11 +26,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "api2llm", editable = "02-api2llm" },
-    { name = "docs-rag-mcp", editable = "03-docs-rag-mcp" },
     { name = "eval-harness", editable = "shared/eval_harness" },
-    { name = "mathlib-mcp", editable = "01-mathlib-mcp" },
-    { name = "mimo-agent-bench", editable = "04-mimo-agent-bench" },
+    { name = "mathlib-mcp", editable = "01-mathlib-mcp-lite" },
 ]
 
 [package.metadata.requires-dev]
@@ -46,17 +37,6 @@ dev = [
 ]
 
 [[package]]
-name = "api2llm"
-version = "0.1.0"
-source = { editable = "02-api2llm" }
-dependencies = [
-    { name = "eval-harness" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "eval-harness", editable = "shared/eval_harness" }]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -64,17 +44,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6", size = 25335, upload-time = "2022-10-25T02:36:20.889Z" },
 ]
-
-[[package]]
-name = "docs-rag-mcp"
-version = "0.1.0"
-source = { editable = "03-docs-rag-mcp" }
-dependencies = [
-    { name = "eval-harness" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "eval-harness", editable = "shared/eval_harness" }]
 
 [[package]]
 name = "eval-harness"
@@ -93,18 +62,7 @@ wheels = [
 [[package]]
 name = "mathlib-mcp"
 version = "0.1.0"
-source = { editable = "01-mathlib-mcp" }
-dependencies = [
-    { name = "eval-harness" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "eval-harness", editable = "shared/eval_harness" }]
-
-[[package]]
-name = "mimo-agent-bench"
-version = "0.1.0"
-source = { editable = "04-mimo-agent-bench" }
+source = { editable = "01-mathlib-mcp-lite" }
 dependencies = [
     { name = "eval-harness" },
 ]

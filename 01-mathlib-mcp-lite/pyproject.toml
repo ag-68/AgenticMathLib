@@ -1,7 +1,7 @@
 [project]
-name = "docs-rag-mcp"
+name = "mathlib-mcp"
 version = "0.1.0"
-description = "MCP server that retrieves version-pinned library documentation for agents."
+description = "Five numerical tools exposed to AI agents through an MCP server."
 requires-python = ">=3.11"
 dependencies = [
     "eval-harness",

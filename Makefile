@@ -1,4 +1,4 @@
-.PHONY: test lint dryrun docs
+.PHONY: test lint dryrun
 
 test:
 	uv run pytest
@@ -8,7 +8,4 @@ lint:
 	uv run ruff format --check .
 
 dryrun:
-	@echo not run
-
-docs:
 	@echo not run

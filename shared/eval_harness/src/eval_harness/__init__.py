@@ -1,7 +1,7 @@
 """Shared evaluation harness: run tasks, check answers, and log the full conversation."""
 
 from eval_harness.answers import ParsedAnswer, parse_final_answer
-from eval_harness.checkers import NumericChecker
+from eval_harness.checkers import DiscreteChecker, IntervalChecker, NumericChecker, get_checker
 from eval_harness.fake import FakeClient
 from eval_harness.loop import run_trial
 from eval_harness.models import (
@@ -15,13 +15,16 @@ from eval_harness.models import (
     ToolCall,
     ToolRecord,
     Verdict,
+    make_verdict,
 )
 
 __all__ = [
     "Checker",
     "Condition",
+    "DiscreteChecker",
     "Executor",
     "FakeClient",
+    "IntervalChecker",
     "ModelClient",
     "ModelResponse",
     "NumericChecker",
@@ -31,6 +34,8 @@ __all__ = [
     "ToolCall",
     "ToolRecord",
     "Verdict",
+    "get_checker",
+    "make_verdict",
     "parse_final_answer",
     "run_trial",
 ]

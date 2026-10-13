@@ -11,8 +11,13 @@ class Task:
     prompt: str
     inputs: dict[str, Any]
     reference: Any
-    tolerance: float | None
-    answer_format: str
+    check: str
+    tolerance: float | None = None
+    split: str = "eval"
+
+    def __post_init__(self) -> None:
+        if self.split not in {"eval", "train"}:
+            raise ValueError(f"split must be 'eval' or 'train', got {self.split!r}")
 
 
 @dataclass
@@ -35,6 +40,23 @@ class Verdict:
     passed: bool
     error_kind: str | None
     detail: str
+    reward: float
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= self.reward <= 1.0:
+            raise ValueError("reward must be between 0 and 1")
+
+
+def make_verdict(
+    passed: bool,
+    error_kind: str | None,
+    detail: str,
+    reward: float | None = None,
+) -> Verdict:
+    """Build a verdict. Reward defaults to 1 on pass and 0 on fail."""
+    if reward is None:
+        reward = 1.0 if passed else 0.0
+    return Verdict(passed=passed, error_kind=error_kind, detail=detail, reward=reward)
 
 
 @dataclass
@@ -55,6 +77,9 @@ class RunLog:
     tool_calls: list[ToolRecord]
     final_answer: Any
     verdict: Verdict
+    reward: float
+    error_kind: str | None
+    split: str
     input_tokens: int
     output_tokens: int
     wall_time_s: float
@@ -69,6 +94,9 @@ class RunLog:
             "tool_calls": [asdict(record) for record in self.tool_calls],
             "final_answer": self.final_answer,
             "verdict": asdict(self.verdict),
+            "reward": self.reward,
+            "error_kind": self.error_kind,
+            "split": self.split,
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "wall_time_s": self.wall_time_s,
