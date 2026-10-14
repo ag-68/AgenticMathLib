@@ -99,9 +99,13 @@ def test_server_lists_five_tools_and_runs_fft() -> None:
     from eval_harness import McpExecutor, ToolCall
 
     with McpExecutor(sys.executable, ["-m", "mathlib_mcp.server"]) as executor:
-        names = sorted(tool["name"] for tool in executor.list_tools())
+        listed = executor.list_tools()
+        names = sorted(tool["name"] for tool in listed)
+        described = {tool["name"]: tool["description"] for tool in listed}
         raw = executor.execute(ToolCall("c1", "fft", {"x": [1.0, 0.0, 0.0, 0.0]}))
     assert names == ["convolve", "fft", "least_squares", "power_spectrum", "solve_linear_system"]
+    assert "When not to use" in described["fft"]
+    assert "least_squares" in described["solve_linear_system"]
     payload = json.loads(raw)
     assert len(payload["re"]) == 4
 

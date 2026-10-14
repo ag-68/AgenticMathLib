@@ -1,0 +1,360 @@
+{
+  "name": "mathlib-mcp-lite",
+  "tools": [
+    {
+      "common_mistakes": [
+        "Assuming the default scaling is orthonormal.",
+        "Inverting with a different norm than the forward call.",
+        "Asking fft for a one-sided power spectrum."
+      ],
+      "conventions": [
+        "A real array is a list of numbers.",
+        "Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+        "At most 4096 elements are accepted. One complex number counts as one element.",
+        "The default norm is backward, not ortho. An inverse call must use the same norm.",
+        "Bins follow SciPy's fft order: the zero frequency is first."
+      ],
+      "example": {
+        "arguments": {
+          "direction": "forward",
+          "norm": "backward",
+          "x": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "output": {
+          "dtype": "complex128",
+          "im": [
+            -0.0,
+            0.0,
+            -0.0,
+            -0.0
+          ],
+          "re": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "shape": [
+            4
+          ]
+        }
+      },
+      "name": "fft",
+      "one_sentence": "Compute a one-dimensional discrete Fourier transform.",
+      "parameters": [
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The 1-D sequence. A real array is a list of numbers. Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+          "name": "x",
+          "type": "list or object"
+        },
+        {
+          "allowed": "forward, inverse",
+          "default": "\"forward\"",
+          "description": "Which transform to apply.",
+          "name": "direction",
+          "type": "string"
+        },
+        {
+          "allowed": "backward, forward, ortho",
+          "default": "\"backward\"",
+          "description": "Scaling. backward is NumPy's usual unnormalized forward transform.",
+          "name": "norm",
+          "type": "string"
+        }
+      ],
+      "purpose": "Transform a 1-D sequence into frequency bins, or restore the sequence.",
+      "related": [
+        "power_spectrum returns frequencies in hertz and one-sided power for a real signal.",
+        "convolve is linear convolution, not multiplication of Fourier transforms."
+      ],
+      "returns": "A complex sequence of the same length, with shape, dtype, re, and im. The inverse of a forward transform uses the same norm and restores the input.",
+      "when_not": "You want the one-sided power of a real recording. Use power_spectrum.",
+      "when_to_use": "You need the forward or inverse discrete Fourier transform of one sequence."
+    },
+    {
+      "common_mistakes": [
+        "Treating power as a density in units of power per hertz.",
+        "Ignoring frequencies_hz and assuming a bin index is already in hertz.",
+        "Passing a complex series."
+      ],
+      "conventions": [
+        "Input is real. A complex object is rejected.",
+        "At most 4096 elements are accepted. One complex number counts as one element.",
+        "frequencies_hz[0] is 0 Hz. The last bin is the Nyquist frequency when n is even.",
+        "power is abs(rfft(samples))^2 divided by the number of samples."
+      ],
+      "example": {
+        "arguments": {
+          "sample_rate_hz": 8.0,
+          "samples": [
+            1.0,
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "output": {
+          "dtype": "float64",
+          "frequencies_hz": [
+            0.0,
+            2.0,
+            4.0
+          ],
+          "power": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "shape": [
+            3
+          ]
+        }
+      },
+      "name": "power_spectrum",
+      "one_sentence": "Compute the one-sided power spectrum of a real signal.",
+      "parameters": [
+        {
+          "allowed": null,
+          "default": null,
+          "description": "A 1-D list of real samples.",
+          "name": "samples",
+          "type": "list"
+        },
+        {
+          "allowed": null,
+          "default": null,
+          "description": "Sample rate in hertz. Must be positive.",
+          "name": "sample_rate_hz",
+          "type": "number"
+        }
+      ],
+      "purpose": "Report frequency bins in hertz and the one-sided power of a real sequence.",
+      "related": [
+        "fft is the transform to use when you will invert it or the input is complex."
+      ],
+      "returns": "frequencies_hz from rfftfreq, power equal to abs(rfft)^2 / n, plus shape and dtype. This is not a power spectral density.",
+      "when_not": "The series is complex, or you need a transform you can invert. Use fft.",
+      "when_to_use": "You have real samples and a sample rate, and you want power per frequency."
+    },
+    {
+      "common_mistakes": [
+        "Using valid when the requested length is the length of a. That is same.",
+        "Expecting the edges to wrap. This is linear convolution."
+      ],
+      "conventions": [
+        "A real array is a list of numbers.",
+        "Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+        "At most 4096 elements are accepted. One complex number counts as one element.",
+        "full returns every overlap, including partial ones at the ends.",
+        "same returns the central part and has the same length as a.",
+        "valid returns only positions where b lies entirely inside a."
+      ],
+      "example": {
+        "arguments": {
+          "a": [
+            1.0,
+            2.0,
+            3.0
+          ],
+          "b": [
+            1.0,
+            1.0
+          ],
+          "mode": "full"
+        },
+        "output": {
+          "dtype": "float64",
+          "shape": [
+            4
+          ],
+          "values": [
+            1.0,
+            3.0,
+            5.0,
+            3.0
+          ]
+        }
+      },
+      "name": "convolve",
+      "one_sentence": "Convolve two one-dimensional sequences.",
+      "parameters": [
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The first 1-D sequence. A real array is a list of numbers. Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+          "name": "a",
+          "type": "list or object"
+        },
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The second 1-D sequence. A real array is a list of numbers. Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+          "name": "b",
+          "type": "list or object"
+        },
+        {
+          "allowed": "full, same, valid",
+          "default": "\"full\"",
+          "description": "Which part of the full convolution to keep.",
+          "name": "mode",
+          "type": "string"
+        }
+      ],
+      "purpose": "Compute the linear convolution of two 1-D sequences.",
+      "related": [
+        "fft does not replace this tool. This tool is linear convolution."
+      ],
+      "returns": "The convolved sequence, with shape, dtype, and either values or re and im. same has the length of a. valid keeps only complete overlaps.",
+      "when_not": "You want circular convolution. This tool does not wrap the edges.",
+      "when_to_use": "You want linear convolution in full, same, or valid mode."
+    },
+    {
+      "common_mistakes": [
+        "Passing a rectangular matrix. The error tells you to use least_squares.",
+        "Ignoring a singular error and treating a failure as a numeric answer."
+      ],
+      "conventions": [
+        "A real array is a list of numbers.",
+        "Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+        "At most 4096 elements are accepted. One complex number counts as one element.",
+        "A must have the same number of rows and columns.",
+        "b has one entry per row.",
+        "residual_norm near zero means the solution fits A x = b."
+      ],
+      "example": {
+        "arguments": {
+          "a": [
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "b": [
+            3.0,
+            4.0
+          ]
+        },
+        "output": {
+          "dtype": "float64",
+          "residual_norm": 0.0,
+          "shape": [
+            2
+          ],
+          "values": [
+            3.0,
+            4.0
+          ]
+        }
+      },
+      "name": "solve_linear_system",
+      "one_sentence": "Solve a square linear system.",
+      "parameters": [
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The matrix A. It must be square. A real array is a list of numbers. Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+          "name": "a",
+          "type": "list of lists or object"
+        },
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The right-hand side, one value per row of A.",
+          "name": "b",
+          "type": "list or object"
+        }
+      ],
+      "purpose": "Solve A x = b when A is square.",
+      "related": [
+        "least_squares minimizes ||A x - b|| when A is not square or not invertible."
+      ],
+      "returns": "The solution vector, with shape, dtype, and residual_norm, the 2-norm of A x - b.",
+      "when_not": "A is rectangular or singular. Use least_squares.",
+      "when_to_use": "A is square and you want the direct solution plus a residual."
+    },
+    {
+      "common_mistakes": [
+        "Reading residual_norm as zero when the system is only approximately consistent.",
+        "Ignoring rank when several solutions fit equally well."
+      ],
+      "conventions": [
+        "A real array is a list of numbers.",
+        "Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+        "At most 4096 elements are accepted. One complex number counts as one element.",
+        "b has one entry per row of A, not per column.",
+        "rank below the number of columns means the solution is not unique."
+      ],
+      "example": {
+        "arguments": {
+          "a": [
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ],
+          "b": [
+            1.0,
+            2.0,
+            3.0
+          ]
+        },
+        "output": {
+          "dtype": "float64",
+          "rank": 2,
+          "residual_norm": 1.336885555457667e-15,
+          "shape": [
+            2
+          ],
+          "values": [
+            0.999999999999999,
+            2.000000000000001
+          ]
+        }
+      },
+      "name": "least_squares",
+      "one_sentence": "Solve a linear least-squares problem.",
+      "parameters": [
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The matrix A, square or rectangular. A real array is a list of numbers. Complex values are {\"re\": [...], \"im\": [...]} with matching shapes.",
+          "name": "a",
+          "type": "list of lists or object"
+        },
+        {
+          "allowed": null,
+          "default": null,
+          "description": "The right-hand side, one value per row of A.",
+          "name": "b",
+          "type": "list or object"
+        }
+      ],
+      "purpose": "Find x that minimizes the 2-norm of A x - b.",
+      "related": [
+        "solve_linear_system is the direct solver for a square invertible matrix."
+      ],
+      "returns": "The solution vector, residual_norm (the 2-norm of A x - b), and rank.",
+      "when_not": "A is square and invertible. Use solve_linear_system for that case.",
+      "when_to_use": "A is rectangular, or a square system may be singular."
+    }
+  ]
+}

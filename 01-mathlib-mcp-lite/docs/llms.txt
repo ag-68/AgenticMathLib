@@ -1,0 +1,9 @@
+# mathlib-mcp-lite
+
+> Five numerical tools. Complex values are objects with re and im. Arrays are limited to 4096 elements.
+
+- [fft](fft.md): Compute a one-dimensional discrete Fourier transform.
+- [power_spectrum](power_spectrum.md): Compute the one-sided power spectrum of a real signal.
+- [convolve](convolve.md): Convolve two one-dimensional sequences.
+- [solve_linear_system](solve_linear_system.md): Solve a square linear system.
+- [least_squares](least_squares.md): Solve a linear least-squares problem.

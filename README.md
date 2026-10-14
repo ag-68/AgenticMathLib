@@ -6,7 +6,7 @@ The repository describes only what is in it. Roadmap items are Planned until the
 
 ## Status
 
-Updated 2026-10-14.
+Updated 2026-10-15.
 
 | Project | What it does | Status | Evidence |
 |---|---|---|---|
@@ -45,7 +45,7 @@ uv run ruff check .
 
 Evaluation results: not run.
 
-The harness has milestones H1 through H3. No real model has been run. Project 01 has its five math tools and an MCP server; generated docs and the 12-task evaluation are not implemented. Project 02 has not been started.
+The harness has milestones H1 through H3. No real model has been run. Project 01 has its five math tools, generated pages, and a short-description condition. The 12-task evaluation is not implemented. Project 02 has not been started.
 
 ## Limitations
 
