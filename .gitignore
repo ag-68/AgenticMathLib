@@ -9,6 +9,7 @@ dist/
 build/
 .uv/
 out/
+shared/eval_harness/eval/results/
 
 .env
 .env.*

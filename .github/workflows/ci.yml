@@ -17,3 +17,6 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest
+      - run: uv run eval run --project toy --conditions A,B --dry-run
+      - run: uv run eval analyze --project toy
+      - run: uv run eval export --project toy --only-passed --out shared/eval_harness/eval/results/export.jsonl

@@ -1,5 +1,7 @@
 """Dataclasses and protocols shared by every project."""
 
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass, field
 from typing import Any, Protocol
 
@@ -70,6 +72,7 @@ class ToolRecord:
 @dataclass
 class RunLog:
     task_id: str
+    category: str
     prompt: str
     condition: str
     trial: int
@@ -80,6 +83,7 @@ class RunLog:
     reward: float
     error_kind: str | None
     split: str
+    tools_available: bool
     input_tokens: int
     output_tokens: int
     wall_time_s: float
@@ -87,6 +91,7 @@ class RunLog:
     def to_dict(self) -> dict[str, Any]:
         return {
             "task_id": self.task_id,
+            "category": self.category,
             "prompt": self.prompt,
             "condition": self.condition,
             "trial": self.trial,
@@ -97,10 +102,32 @@ class RunLog:
             "reward": self.reward,
             "error_kind": self.error_kind,
             "split": self.split,
+            "tools_available": self.tools_available,
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "wall_time_s": self.wall_time_s,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> RunLog:
+        return cls(
+            task_id=data["task_id"],
+            category=data["category"],
+            prompt=data["prompt"],
+            condition=data["condition"],
+            trial=data["trial"],
+            messages=data["messages"],
+            tool_calls=[ToolRecord(**record) for record in data["tool_calls"]],
+            final_answer=data["final_answer"],
+            verdict=Verdict(**data["verdict"]),
+            reward=data["reward"],
+            error_kind=data["error_kind"],
+            split=data["split"],
+            tools_available=data["tools_available"],
+            input_tokens=data["input_tokens"],
+            output_tokens=data["output_tokens"],
+            wall_time_s=data["wall_time_s"],
+        )
 
 
 class Executor(Protocol):

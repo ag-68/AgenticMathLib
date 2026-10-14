@@ -1,0 +1,7 @@
+# Names only. The model string is read from the environment at run time.
+provider: openai
+model_env: EVAL_MODEL
+trials: 2
+max_tool_calls: 8
+seed: 0
+timeout_s: 20

@@ -39,13 +39,13 @@ uv run pytest
 uv run ruff check .
 ```
 
-`make test` and `make lint` run the same checks. `make dryrun` prints `not run` until the evaluation command exists.
+`make test` and `make lint` run the same checks. `make dryrun` replays a toy task set with a scripted model and writes a results table. That table is a software check, not a measured result.
 
 ## Results
 
 Evaluation results: not run.
 
-The harness has milestones H1 and H2: a fake model client, the agent loop, run logs, three checkers, a code sandbox, an MCP executor, and a provider client. No evaluation has been run. Project 01 is a package skeleton. Its five tools are not implemented. Project 02 has not been started.
+The harness has milestones H1 through H3: the loop, checkers, code sandbox, MCP executor, provider client, dry-run command, results table, and training-export guard. No real model has been run. Project 01 is a package skeleton. Its five tools are not implemented. Project 02 has not been started.
 
 ## Limitations
 

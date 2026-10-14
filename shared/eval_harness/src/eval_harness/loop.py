@@ -32,6 +32,7 @@ def run_trial(
         messages.append({"role": "user", "content": condition.extra_context})
     messages.append({"role": "user", "content": task.prompt})
     tools = condition.executor.list_tools() if condition.executor is not None else None
+    tools_available = bool(tools)
 
     records: list[ToolRecord] = []
     input_tokens = 0
@@ -84,6 +85,7 @@ def run_trial(
 
     return RunLog(
         task_id=task.id,
+        category=task.category,
         prompt=task.prompt,
         condition=condition.name,
         trial=trial,
@@ -94,6 +96,7 @@ def run_trial(
         reward=verdict.reward,
         error_kind=verdict.error_kind,
         split=task.split,
+        tools_available=tools_available,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
         wall_time_s=time.perf_counter() - started,

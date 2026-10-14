@@ -7,6 +7,9 @@ dependencies = [
     "mcp>=2.3.0",
 ]
 
+[project.scripts]
+eval = "eval_harness.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

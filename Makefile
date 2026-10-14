@@ -8,4 +8,5 @@ lint:
 	uv run ruff format --check .
 
 dryrun:
-	@echo not run
+	uv run eval run --project toy --conditions A,B --dry-run
+	uv run eval analyze --project toy
