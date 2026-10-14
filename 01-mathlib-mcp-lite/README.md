@@ -4,7 +4,7 @@ Five numerical tools offered to AI agents, with descriptions and errors designed
 
 ## Status
 
-**In progress** (2026-10-13). Repository skeleton only. Milestones M1, M2, and M3 have not started.
+**In progress** (2026-10-14). Milestone M1 is implemented: the five tools, structured errors, and tests against SciPy. M2 and M3 have not started.
 
 ## Scope
 
@@ -14,11 +14,11 @@ Five numerical tools offered to AI agents, with descriptions and errors designed
 
 ## What works
 
-The package `mathlib_mcp` imports. The project specification is in `SPEC.md`.
+The five tools run on NumPy and SciPy: `fft`, `power_spectrum`, `convolve`, `solve_linear_system`, and `least_squares`. They accept real lists and complex `{"re", "im"}` values, reject arrays larger than 4,096 elements, and return `error_code`, `message`, and `fix_hint` for bad inputs. A non-square solve points at `least_squares`. An MCP server exposes the same five tools. Tests compare the numeric results with SciPy.
 
 ## What does not work yet
 
-The five tools, structured errors, generated documentation, the 12 tasks, and conditions A, B, and C are not implemented.
+Generated documentation, the short-description condition, the 12 tasks, and the evaluation are not implemented.
 
 ## Results (real runs only)
 

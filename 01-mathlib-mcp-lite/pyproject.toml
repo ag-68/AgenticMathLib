@@ -5,6 +5,9 @@ description = "Five numerical tools exposed to AI agents through an MCP server."
 requires-python = ">=3.11"
 dependencies = [
     "eval-harness",
+    "mcp>=2.3.0",
+    "numpy>=2",
+    "scipy>=1.14",
 ]
 
 [tool.uv.sources]
